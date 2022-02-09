@@ -1,24 +1,31 @@
 import { useState } from 'react'
 import './Form.css'
+import { getCurrentYear } from '../utils/date'
 
 
 const Form = () => {
 	// State variables
 	const [name, setName] = useState<string>('')
-	const [nameIsVisited, setNameIsVisited] = useState<boolean>(false)
 	const [image, setImage] = useState<string>('')
+	const [year, setYear] = useState<number>(0)
+	const [nameIsVisited, setNameIsVisited] = useState<boolean>(false)
 	const [imageIsVisited, setImageIsVisited] = useState<boolean>(false)
+	const [yearIsVisited, setYearIsVisited] = useState<boolean>(false)
 	
 	// Calculated from state variables
 	// Validation functions
 	const [nameIsValid, nameMessage] = isValidName(name);
 	const [imageIsValid, imageMessage] = isValidImage(image);
+	const [yearIsValid, yearMessage] = isValidYear(year);
+	const formIsValid = nameIsValid && imageIsValid && yearIsValid
 
 	// Styling the UI
 	const nameInputCss  = !nameIsVisited  ? '' : (nameIsValid  ? 'valid' : 'invalid');
 	const imageInputCss = !imageIsVisited ? '' : (imageIsValid ? 'valid' : 'invalid');
+	const yearInputCss = !yearIsVisited  ? '' : (yearIsValid  ? 'valid' : 'invalid');
 	const nameMessageCss  = (nameIsVisited  ? '' : 'invisible') + (nameIsValid  ? '' : ' error')
 	const imageMessageCss = (imageIsVisited ? '' : 'invisible') + (imageIsValid ? '' : ' error')
+	const yearMessageCss = (yearIsVisited ? '' : 'invisible') + (yearIsValid ? '' : ' error')
 
 
 	return (
@@ -50,11 +57,18 @@ const Form = () => {
 
 			<section>
 				<label>Födelseår</label>
-				<input className="error invalid" type="text" placeholder="Årtal med fyra siffror" />
-				<span className="error"> ❌ Felmeddelande </span>
+				<input
+					className={yearInputCss}
+					type="text"
+					placeholder="Årtal med fyra siffror"
+					value={"" + year}
+					onChange={e => setYear(Number(e.target.value))}
+					onBlur={() => setYearIsVisited(true)}
+					/>
+				<span className={yearMessageCss}> {yearMessage} </span>
 			</section>
 			<section>
-				<button>
+				<button disabled={!formIsValid}>
 					Spara ändringar
 				</button>
 			</section>
@@ -79,6 +93,20 @@ function isValidImage(url: string): [boolean, string] {
 		return [true, '✔️']
 	} else {
 		return [false, '❌ Skriv en länk till en jpg- eller png-bild.']
+	}
+}
+
+function isValidYear(year: number): [boolean, string] {
+	// 18-årsgräns för att använda appen
+	const currentYear = getCurrentYear()
+	if( year > currentYear ) {
+		return [false, '❌ Skriv in det året du föddes, med fyra siffror.']
+	} else if( currentYear - year > 150 ) {
+		return [false, '❌ Skriv in det året du föddes, med fyra siffror.']
+	} else if( currentYear - year >= 18 ) {
+		return [true, '✔️']
+	} else {
+		return [false, '❌ Du måste vara 18 år för att använda appen.']
 	}
 }
 
