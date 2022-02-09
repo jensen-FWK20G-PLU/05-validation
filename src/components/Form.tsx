@@ -3,13 +3,22 @@ import './Form.css'
 
 
 const Form = () => {
+	// State variables
 	const [name, setName] = useState<string>('')
 	const [nameIsVisited, setNameIsVisited] = useState<boolean>(false)
+	const [image, setImage] = useState<string>('')
+	const [imageIsVisited, setImageIsVisited] = useState<boolean>(false)
 	
+	// Calculated from state variables
+	// Validation functions
 	const [nameIsValid, nameMessage] = isValidName(name);
+	const [imageIsValid, imageMessage] = isValidImage(image);
 
-	const nameInputCss = !nameIsVisited ? '' : (nameIsValid ? 'valid' : 'invalid');
-	const nameMessageCss = (nameIsVisited ? '' : 'invisible') + (nameIsValid ? '' : ' error')
+	// Styling the UI
+	const nameInputCss  = !nameIsVisited  ? '' : (nameIsValid  ? 'valid' : 'invalid');
+	const imageInputCss = !imageIsVisited ? '' : (imageIsValid ? 'valid' : 'invalid');
+	const nameMessageCss  = (nameIsVisited  ? '' : 'invisible') + (nameIsValid  ? '' : ' error')
+	const imageMessageCss = (imageIsVisited ? '' : 'invisible') + (imageIsValid ? '' : ' error')
 
 
 	return (
@@ -29,8 +38,14 @@ const Form = () => {
 
 			<section>
 				<label>Profilbild</label>
-				<input className="valid" type="text" placeholder="länk/bild.jpg" />
-				<span className=""> ✔️ </span>
+				<input
+					className={imageInputCss}
+					type="text"
+					placeholder="länk/bild.jpg"
+					value={image}
+					onChange={e => setImage(e.target.value)}
+					onBlur={() => setImageIsVisited(true)} />
+				<span className={imageMessageCss}> {imageMessage} </span>
 			</section>
 
 			<section>
@@ -53,6 +68,17 @@ function isValidName(name: string): [boolean, string] {
 		return [true, '✔️']
 	} else {
 		return [false, '❌ Skriv ditt namn, minst två bokstäver.']
+	}
+}
+
+function isValidImage(url: string): [boolean, string] {
+	// Tillåtna format är .jpg och .png
+	// Exempel: picture.jpg, PENGUIN.PNG
+	let lower: string = url.toLowerCase();
+	if( lower.endsWith('.jpg') || lower.endsWith('.png') ) {
+		return [true, '✔️']
+	} else {
+		return [false, '❌ Skriv en länk till en jpg- eller png-bild.']
 	}
 }
 
